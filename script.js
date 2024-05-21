@@ -81,74 +81,85 @@ function handleClick(cell, index) {
         cell.innerHTML = currentPlayer === 'circle' ? generateAnimatedCircleSVG() : generateAnimatedXSVG();
         cell.onclick = null;
         currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
-        if (isGameFinished()) {
+
+        if (isGameFinishedByWin()) {
             const winCombination = getWinningCombination();
             drawWinningLine(winCombination);
             AUDIO_GAME_WIN.play();
             document.getElementById('restart-btn').classList.remove('d-none');
         }
-    }
-}
-function isGameFinished() {
-    return fields.every((field) => field !== null) || getWinningCombination() !== null;
-}
-
-function getWinningCombination() {
-    for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
-        const [a, b, c] = WINNING_COMBINATIONS[i];
-        if (fields[a] === fields[b] && fields[b] === fields[c] && fields[a] !== null) {
-            return WINNING_COMBINATIONS[i];
-            
+        else if (isGameFinished()){
+            AUDIO_GAME_FINISHED.play();
+            document.getElementById('restart-btn').classList.remove('d-none');
         }
+
     }
-    return null;
 }
 
-function drawWinningLine(combination) {
-    const lineColor = '#ffffff';
-    const lineWidth = 5;
+    function isGameFinished() {
+        return fields.every((field) => field !== null);
+    }
 
-    const startCell = document.querySelectorAll(`td`)[combination[0]];
-    const endCell = document.querySelectorAll(`td`)[combination[2]];
-    const startRect = startCell.getBoundingClientRect();
-    const endRect = endCell.getBoundingClientRect();
+    function isGameFinishedByWin(){
+        return getWinningCombination() !== null;
+    }
 
-    const contentRect = document.getElementById('content').getBoundingClientRect();
+    function getWinningCombination() {
+        for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
+            const [a, b, c] = WINNING_COMBINATIONS[i];
+            if (fields[a] === fields[b] && fields[b] === fields[c] && fields[a] !== null) {
+                return WINNING_COMBINATIONS[i];
 
-    const lineLength = Math.sqrt(
-        Math.pow(endRect.left - startRect.left, 2) + Math.pow(endRect.top - startRect.top, 2),
-        Math.pow(endRect.left - startRect.left, 2) + Math.pow(endRect.top - startRect.top, 2)
-    );
-    const lineAngle = Math.atan2(endRect.top - startRect.top, endRect.left - startRect.left);
+            }
+        }
+        return null;
+    }
 
-    const line = document.createElement('div');
-    line.style.position = 'absolute';
-    line.style.width = `${lineLength}px`;
-    line.style.height = `${lineWidth}px`;
-    line.style.backgroundColor = lineColor;
-    line.style.top = `${ startRect.top + startRect.height / 2 - lineWidth / 2 } px`;
-    line.style.left = `${ startRect.left + startRect.width / 2 } px`;
-    line.style.transform = `rotate(${ lineAngle }rad)`;
-    line.style.top = `${startRect.top + startRect.height / 2 - lineWidth / 2 - contentRect.top}px`;
-    line.style.left = `${startRect.left + startRect.width / 2 - contentRect.left}px`;
-    line.style.transform = `rotate(${lineAngle}rad)`;
-    line.style.transformOrigin = `top left`;
-    document.getElementById('content').appendChild(line);
-}
+    function drawWinningLine(combination) {
+        const lineColor = '#ffffff';
+        const lineWidth = 5;
 
-function restartGame(){
-    fields = [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-    ];
+        const startCell = document.querySelectorAll(`td`)[combination[0]];
+        const endCell = document.querySelectorAll(`td`)[combination[2]];
+        const startRect = startCell.getBoundingClientRect();
+        const endRect = endCell.getBoundingClientRect();
 
-    document.getElementById('restart-btn').classList.add('d-none');
-    render();
-}
+        const contentRect = document.getElementById('content').getBoundingClientRect();
+
+        const lineLength = Math.sqrt(
+            Math.pow(endRect.left - startRect.left, 2) + Math.pow(endRect.top - startRect.top, 2),
+            Math.pow(endRect.left - startRect.left, 2) + Math.pow(endRect.top - startRect.top, 2)
+        );
+        const lineAngle = Math.atan2(endRect.top - startRect.top, endRect.left - startRect.left);
+
+        const line = document.createElement('div');
+        line.style.position = 'absolute';
+        line.style.width = `${lineLength}px`;
+        line.style.height = `${lineWidth}px`;
+        line.style.backgroundColor = lineColor;
+        line.style.top = `${startRect.top + startRect.height / 2 - lineWidth / 2} px`;
+        line.style.left = `${startRect.left + startRect.width / 2} px`;
+        line.style.transform = `rotate(${lineAngle}rad)`;
+        line.style.top = `${startRect.top + startRect.height / 2 - lineWidth / 2 - contentRect.top}px`;
+        line.style.left = `${startRect.left + startRect.width / 2 - contentRect.left}px`;
+        line.style.transform = `rotate(${lineAngle}rad)`;
+        line.style.transformOrigin = `top left`;
+        document.getElementById('content').appendChild(line);
+    }
+
+    function restartGame() {
+        fields = [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+        ];
+
+        document.getElementById('restart-btn').classList.add('d-none');
+        render();
+    }
